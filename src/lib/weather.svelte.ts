@@ -65,7 +65,7 @@ class cloud {
         }
 
         // Fade factors
-        this.cloudOpacity = weatherState === "clear" ? 0 : 1;
+        this.cloudOpacity = weatherState === "clear" ? 0 : 0.4;
         this.rainOpacity = 0;
         this.boltOpacity = 0;
 
