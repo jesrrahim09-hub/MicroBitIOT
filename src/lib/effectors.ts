@@ -25,7 +25,7 @@ class effectors {
         this.lampDepth = 300;
 
         // Position the lamp above the farmland
-        this.lampPos = p5.createVector(0, -p5.height / 3 - 100, 0);
+        this.lampPos = p5.createVector(0, -p5.height / 3 - 50, 0);
     }
 
     display(p5: p5) {
@@ -55,20 +55,42 @@ class effectors {
             p5.pop();
 
             // Stylized light rays
+
+            // pulsing and animation of rays
+            const t = p5.millis() / 1000;
+            const pulse = 1 + 0.1 * Math.sin(t*2);
+
+            //ray detailing
             p5.push();
             p5.translate(0, 64, 0);
             p5.stroke(255, 255, 180, 90);
             p5.strokeWeight(2.5);
             const rayCount = 32;
-            const rayLength = 180;
+            const rayLength = 540;
             for (let i = 0; i < rayCount; i++) {
                 const angle = (2 * Math.PI * i) / rayCount;
-                const x = Math.cos(angle) * 80;
-                const z = Math.sin(angle) * 80;
+                const x = Math.cos(angle) * 120;
+                const z = Math.sin(angle) * 120;
                 p5.line(0, 0, 0, x, rayLength, z);
             }
             p5.pop();
             p5.pop();
+
+            p5.push();
+                p5.translate(0, 64, 0);
+                p5.stroke(255, 255, 180, 90);
+                p5.strokeWeight(2.5);
+                const rayCount = 32;
+                const rayLength = 360;
+                for (let i=0; i < rayCount; i++) {
+                    const angle = (2 * Math.PI * i)/rayCount;
+                    const x = Math.PI * i)/rayCount;
+                    const z = Math.sin(angle) * 80;
+                    p5.line(0, 0, 0, x, rayLength, z);
+                }
+                p5.pop();
+                p5.pop();
+            
         }
 
         // --- Heater ---
