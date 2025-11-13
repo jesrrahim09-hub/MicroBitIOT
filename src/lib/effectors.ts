@@ -257,7 +257,7 @@ class effectors {
     }
 
 
-    update(p5: p5) {
+    update(p5: p5): void {
         this.light = !!simState.effectors[0];
         this.temp = !!simState.effectors[1];
         this.humidity = !!simState.effectors[3];
