@@ -195,67 +195,93 @@ class effectors {
             p5.pop();
         }
 
-            // --- Water Sprinkler ---
-        if (this.soilm) {
-            p5.push();
+            // --- Sprinkler (simple geometric + rotating jets) ---
+    if (this.soilm) {
+        p5.push();
     
         // Position on farmland
-        const sprinklerX = 0;
-        const sprinklerY = 50; // slightly above soil
-        const sprinklerZ = 0;
-        p5.translate(sprinklerX, sprinklerY, sprinklerZ);
+        const sprX = 0;
+        const sprY = 40;
+        const sprZ = 0;
+        p5.translate(sprX, sprY, sprZ);
     
-        // Sprinkler base
-        p5.noStroke();
-        p5.ambientMaterial(180, 180, 150);
-        p5.box(20, 50, 20); // vertical post
-    
-        // Sprinkler head
+        // ==== BASE ====
         p5.push();
-        p5.translate(0, -30, 0); // top of the post
-        p5.ambientMaterial(200, 200, 180);
-        p5.cylinder(12, 8); // small cylinder for head
+        p5.fill(150, 150, 150);
+        p5.cylinder(30, 20, 24, 1);   // short base cylinder
         p5.pop();
     
-        // Water jets (radial streams)
-        const jetCount = 16; // number of water jets around head
-        const jetLength = 40; // length of each jet
-        p5.strokeWeight(2);
+        // ==== VERTICAL PIPE ====
+        p5.push();
+        p5.translate(0, -30, 0);      // lift upwards
+        p5.fill(170, 170, 170);
+        p5.cylinder(10, 60, 16, 1);
+        p5.pop();
+    
+        // ==== ROTATING SPRINKLER HEAD ====
+        p5.push();
+        p5.translate(0, -60, 0);
+    
+        // rotate head continuously
+        const rotationSpeed = 0.04;
+        p5.rotateY(p5.frameCount * rotationSpeed);
+    
+        // head
+        p5.fill(180, 180, 180);
+        p5.sphere(14);
+    
+        // sprinkler arms
+        const armLength = 40;
+        const armWidth  = 6;
+    
+        for (let a = 0; a < 3; a++) {
+            p5.push();
+            p5.rotateY((p5.TWO_PI / 3) * a);
+            p5.translate(armLength / 2, 0, 0);
+            p5.box(armLength, armWidth, armWidth);   // arm bar
+            p5.pop();
+        }
+        p5.pop();
+    
+        // ==== WATER JETS ====
+        p5.push();
+        p5.translate(0, -60, 0);  // start from head
+    
+        const jetCount = 3;        // 3 arms
+        const segments = 26;       // length of each stream
+        const spreadAngle =  p5.radians(22);  // slight upward tilt
+    
         for (let j = 0; j < jetCount; j++) {
-            const angle = (j / jetCount) * p5.TWO_PI; // spread evenly in circle
-            for (let seg = 0; seg < jetLength; seg++) {
-                const radius = seg * 0.5; // gradual outward spread
-                const x1 = Math.cos(angle) * radius;
-                const y1 = -30 + seg * 1; // slightly upward from sprinkler head
-                const z1 = Math.sin(angle) * radius;
     
-                const x2 = Math.cos(angle) * (radius + 0.5);
-                const y2 = -30 + (seg + 1) * 1;
-                const z2 = Math.sin(angle) * (radius + 0.5);
+            // match water jets to arm rotation
+            const baseAngle = p5.frameCount * rotationSpeed + (p5.TWO_PI / 3) * j;
     
-                const alpha = p5.map(seg, 0, jetLength, 200, 50);
-                p5.stroke(70, 160, 255, alpha);
+            for (let s = 0; s < segments; s++) {
+                const dist0 = s * 3;
+                const dist1 = (s + 1) * 3;
+    
+                // small jitter to look natural
+                const jitter = Math.sin(p5.frameCount * 0.05 + s * 0.3) * 0.6;
+    
+                const x1 = Math.cos(baseAngle) * dist0 + jitter;
+                const z1 = Math.sin(baseAngle) * dist0 + jitter;
+                const y1 = Math.sin(spreadAngle) * -dist0;
+    
+                const x2 = Math.cos(baseAngle) * dist1 + jitter;
+                const z2 = Math.sin(baseAngle) * dist1 + jitter;
+                const y2 = Math.sin(spreadAngle) * -dist1;
+    
+                const alpha = p5.map(s, 0, segments - 1, 220, 40);
+    
+                p5.stroke(80, 170, 255, alpha);
+                p5.strokeWeight(2);
                 p5.line(x1, y1, z1, x2, y2, z2);
             }
         }
     
-        //droplets at tips of jets
-        p5.noStroke();
-        for (let j = 0; j < jetCount; j++) {
-            const angle = (j / jetCount) * p5.TWO_PI;
-            const x = Math.cos(angle) * jetLength * 0.5;
-            const y = -30 + jetLength;
-            const z = Math.sin(angle) * jetLength * 0.5;
-            p5.fill(90, 180, 255, 180);
-            p5.push();
-            p5.translate(x, y, z);
-            p5.sphere(3);
-            p5.pop();
-        }
-    
+        p5.pop();
         p5.pop();
     }
-
 
     update(p5) {
         this.light = !!simState.effectors[0];
